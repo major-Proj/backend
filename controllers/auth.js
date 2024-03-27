@@ -1,6 +1,17 @@
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
 const db = require('../db/connect');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    port: 465,               // true for 465, false for other ports
+    host: "smtp.gmail.com",
+       auth: {
+            user: 'aiarjun027@gmail.com',
+            pass: 'hhfm nzhs orqe jcqg',
+         },
+    secure: true,
+    });
 
 const login = async (req, res) => {
     try {
@@ -38,6 +49,22 @@ const register_user = async (req, res) => {
                     'INSERT INTO change_password (user_id,count) VALUES ($1, $2) RETURNING *',
                     [result.rows[0].user_id, 0]
                 );
+
+                const mailData = {
+                    from: 'aiarjun027@gmail.com', 
+                      to: result.rows[0].email,   
+                      subject: 'welcome to appliation',
+                      text: 'mail added',
+                      html: `<b>Hey there! </b> <br> Admin has added your mail to our application<br/>`,
+                    };
+
+                transporter.sendMail(mailData, function (err, info) {
+                    if(err)
+                        console.log(err)
+                    else
+                        console.log(info);
+                    });
+                    
                 res.json({ message: "User created successfully", user: result.rows[0] });
 
             } else {
@@ -55,8 +82,10 @@ const register_user = async (req, res) => {
 const generate_otp = async (req, res) => {
     try {
         const { email } = req.body;
-
-        if (email) {
+        const result = await db.query('SELECT * FROM users');
+        const user = await result.rows.find(u => { return u.email === email});
+    
+        if (user) {
             const otp = Math.floor(10000 + Math.random() * 90000).toString();
             const result = await db.query(
                 'INSERT INTO temp_otp (email, otp, created_at) VALUES ($1, $2, $3) RETURNING *',
@@ -64,8 +93,23 @@ const generate_otp = async (req, res) => {
             );
 
             res.json({ message: "OTP created successfully", payload: result.rows[0] });
+
+            const mailData = {
+                from: 'aiarjun027@gmail.com', 
+                  to: result.rows[0].email,   
+                  subject: 'OTP - please do not share dude',
+                  text: 'OTP requested',
+                  html: `<b>Hey there! </b> <br> your otp is ${otp}<br/>`,
+                };
+
+            transporter.sendMail(mailData, function (err, info) {
+                if(err)
+                    console.log(err)
+                else
+                    console.log(info);
+                });
         } else {
-            res.json({ message: "There is no email" })
+            res.json({ message: "There is no email in db" })
         }
 
     } catch (err) {
@@ -80,13 +124,18 @@ const change_password = async (req, res) => {
 
         if (email && otp) {
             const result = await db.query('SELECT * FROM temp_otp');
+    
             const check_otp = await result.rows.find(u => { return u.email === email && u.otp === otp });
-
             if (check_otp) {
                 try {
                     const result = await db.query(
                         'UPDATE users SET password = $1 WHERE email = $2 RETURNING *',
                         [new_password, email]
+                    );
+
+                    const delete_ = await db.query(
+                        'DELETE FROM temp_otp WHERE email = $1 RETURNING *',
+                        [email]
                     );
 
                     if (result.rows.length > 0) {
@@ -101,8 +150,11 @@ const change_password = async (req, res) => {
                     console.error('Error executing query', err);
                     res.status(500).json({ message: 'Error changing password' });
                 }
-            } 
+            } else {
+                res.json({ message: "otp not found" })
+            }
         } else {
+            
             res.json({ message: "There is no email or otp" })
         }
 
