@@ -22,7 +22,8 @@ const login = async (req, res) => {
         if (user) {
             const accessToken = jwt.sign({ user_id: user.user_id, email: user.email, first_name: user.first_name, role: user.role }, accessTokenSecret);
             res.json({
-                accessToken
+                accessToken,
+                role:user.role
             });
         } else {
             res.json({ message: 'Username or password incorrect' });
@@ -46,8 +47,8 @@ const register_user = async (req, res) => {
             if (result.rows.length > 0) {
 
                 await db.query(
-                    'INSERT INTO change_password (user_id,count) VALUES ($1, $2) RETURNING *',
-                    [result.rows[0].user_id, 0]
+                    'INSERT INTO change_password (email,count) VALUES ($1, $2) RETURNING *',
+                    [result.rows[0].email, 0]
                 );
 
                 const mailData = {
@@ -133,6 +134,11 @@ const change_password = async (req, res) => {
                         [new_password, email]
                     );
 
+                    const count_ = await db.query(
+                        'UPDATE change_password SET count = $1 WHERE email = $2 RETURNING *',
+                        [1, email]
+                    );
+
                     const delete_ = await db.query(
                         'DELETE FROM temp_otp WHERE email = $1 RETURNING *',
                         [email]
@@ -164,6 +170,10 @@ const change_password = async (req, res) => {
     }
 };
 
+const user_detail = async (req,res) => {
+    res.json(req.user)
+}
+
 const test = async (req, res) => {
     console.log("Health Check!")
     res.send("Server UP!!")
@@ -174,5 +184,6 @@ module.exports = {
     test,
     register_user,
     generate_otp,
-    change_password
+    change_password,
+    user_detail
 }

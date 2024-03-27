@@ -11,4 +11,6 @@ router.post('/login',AuthControllers.login);
 router.post('/registerUser',utils.authenticateJWT,AuthControllers.register_user);
 router.post('/generateOtp',AuthControllers.generate_otp);
 router.post('/changePassword',AuthControllers.change_password);
+router.post('/userDetail',AuthControllers.user_detail);
+
 module.exports = router;
