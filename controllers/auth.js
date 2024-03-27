@@ -56,7 +56,7 @@ const register_user = async (req, res) => {
                       to: result.rows[0].email,   
                       subject: 'welcome to appliation',
                       text: 'mail added',
-                      html: `<b>Hey there! </b> <br> Admin has added your mail to our application<br/>`,
+                      html: `<b>Hey there! </b> <br> Admin has added your mail to our application <br/>`,
                     };
 
                 transporter.sendMail(mailData, function (err, info) {
