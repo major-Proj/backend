@@ -5,25 +5,122 @@ const db = require('../db/connect');
 const login = async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM users');
-        const user = await data.find(u => { return u.username === username && u.password === password });
-        res.json(result.rows);
-      } catch (err) {
+        const { email, password } = req.body;
+        const user = await result.rows.find(u => { return u.email === email && u.password === password });
+
+        if (user) {
+            const accessToken = jwt.sign({ user_id: user.user_id, email: user.email, first_name: user.first_name, role: user.role }, accessTokenSecret);
+            res.json({
+                accessToken
+            });
+        } else {
+            res.json({ message: 'Username or password incorrect' });
+        }
+    } catch (err) {
         console.error('Error executing query', err);
-        res.status(500).send('Error retrieving users');
-      }
+        res.status(500).json({ message: 'Error retrieving users' });
+    }
 };
 
-const test = async (req,res) => {
+const register_user = async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM users');
-        res.json(result.rows);
-      } catch (err) {
+        const { first_name, last_name, role, password, email, phone_number } = req.body;
+
+        if (req.user && req.user.role === "admin") {
+            const result = await db.query(
+                'INSERT INTO users (first_name, last_name, role, password, email, phone_number, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+                [first_name, last_name, role, password, email, phone_number, new Date()]
+            );
+
+            if (result.rows.length > 0) {
+
+                await db.query(
+                    'INSERT INTO change_password (user_id,count) VALUES ($1, $2) RETURNING *',
+                    [result.rows[0].user_id, 0]
+                );
+                res.json({ message: "User created successfully", user: result.rows[0] });
+
+            } else {
+                res.status(500).json({ message: "Error creating user" });
+            }
+        } else {
+            res.status(403).json({ message: "Only admins can perform this function" });
+        }
+    } catch (err) {
+        console.error('Error creating user', err);
+        res.status(500).json({ message: "Error creating user" });
+    }
+};
+
+const generate_otp = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (email) {
+            const otp = Math.floor(10000 + Math.random() * 90000).toString();
+            const result = await db.query(
+                'INSERT INTO temp_otp (email, otp, created_at) VALUES ($1, $2, $3) RETURNING *',
+                [email, otp, new Date()]
+            );
+
+            res.json({ message: "OTP created successfully", payload: result.rows[0] });
+        } else {
+            res.json({ message: "There is no email" })
+        }
+
+    } catch (err) {
         console.error('Error executing query', err);
-        res.status(500).send('Error retrieving users');
-      }
+        res.status(500).json({ message: 'Error generating otp' });
+    }
+};
+
+const change_password = async (req, res) => {
+    try {
+        const { email, new_password, otp } = req.body;
+
+        if (email && otp) {
+            const result = await db.query('SELECT * FROM temp_otp');
+            const check_otp = await result.rows.find(u => { return u.email === email && u.otp === otp });
+
+            if (check_otp) {
+                try {
+                    const result = await db.query(
+                        'UPDATE users SET password = $1 WHERE email = $2 RETURNING *',
+                        [new_password, email]
+                    );
+
+                    if (result.rows.length > 0) {
+
+                        res.json({ message: "User password changed successfully", user: result.rows[0] });
+
+                    } else {
+                        res.status(500).json({ message: "Error changing password" });
+                    }
+                }
+                catch (err) {
+                    console.error('Error executing query', err);
+                    res.status(500).json({ message: 'Error changing password' });
+                }
+            } 
+        } else {
+            res.json({ message: "There is no email or otp" })
+        }
+
+    } catch (err) {
+        console.error('Error executing query', err);
+        res.status(500).json({ message: 'Error changing password' });
+    }
+};
+
+const test = async (req, res) => {
+    console.log("Health Check!")
+    res.send("Server UP!!")
 }
 
 module.exports = {
     login,
-    test
+    test,
+    register_user,
+    generate_otp,
+    change_password
 }
