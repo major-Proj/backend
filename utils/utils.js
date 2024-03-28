@@ -1,5 +1,16 @@
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    port: 465,               // true for 465, false for other ports
+    host: "smtp.gmail.com",
+       auth: {
+            user: 'aiarjun027@gmail.com',
+            pass: 'hhfm nzhs orqe jcqg',
+         },
+    secure: true,
+    });
 
 
 const authenticateJWT = (req, res, next) => {
@@ -21,6 +32,8 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
+
 module.exports = {
-    authenticateJWT
+    authenticateJWT,
+    transporter
   }

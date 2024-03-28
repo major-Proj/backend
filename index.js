@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const myRoute = require('./routes/allRoutes');
 const bodyParser = require('body-parser');
+const mongodb = require('./db/connect.js');
 
 var cors = require('cors')
 

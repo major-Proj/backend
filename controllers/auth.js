@@ -1,23 +1,13 @@
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-const db = require('../db/connect');
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-    port: 465,               // true for 465, false for other ports
-    host: "smtp.gmail.com",
-       auth: {
-            user: 'aiarjun027@gmail.com',
-            pass: 'hhfm nzhs orqe jcqg',
-         },
-    secure: true,
-    });
+const { UserModel,otpModel } = require('../models/Models')
+const { transporter } = require('../utils/utils')
 
 const login = async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM users');
+        const result = await UserModel.find();
         const { email, password } = req.body;
-        const user = await result.rows.find(u => { return u.email === email && u.password === password });
+        const user = await result.find(u => { return u.email === email && u.password === password });
 
         if (user) {
             const accessToken = jwt.sign({ user_id: user.user_id, email: user.email, first_name: user.first_name, role: user.role }, accessTokenSecret);
@@ -39,24 +29,34 @@ const register_user = async (req, res) => {
         const { first_name, last_name, role, password, email, phone_number } = req.body;
 
         if (req.user && req.user.role === "admin") {
-            const result = await db.query(
-                'INSERT INTO users (first_name, last_name, role, password, email, phone_number, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-                [first_name, last_name, role, password, email, phone_number, new Date()]
-            );
-
-            if (result.rows.length > 0) {
-
-                await db.query(
-                    'INSERT INTO change_password (email,count) VALUES ($1, $2) RETURNING *',
-                    [result.rows[0].email, 0]
-                );
+            const newUser = new UserModel({
+                first_name: first_name,
+                last_name: last_name,
+                role: role,
+                password: password,
+                email: email,
+                phone_number: phone_number,
+                created_at: new Date()
+              });
+              
+              
+              try {
+                const result = await newUser.save();
+                console.log(result);
+                
+              } catch (error) {
+                console.error(error);
+              }
+            
+            const user = await UserModel.findOne({ email: email });
+            if (user) {
 
                 const mailData = {
                     from: 'aiarjun027@gmail.com', 
-                      to: result.rows[0].email,   
+                      to: email,   
                       subject: 'welcome to appliation',
                       text: 'mail added',
-                      html: `<b>Hey there! </b> <br> Admin has added your mail to our application <br/>`,
+                      html: `<b>Hey there! </b> <br> Admin has added your mail to our application <br/> <br>visit /forget-password/otp?email=${encodeURIComponent(email)} to change your password</br>`,
                     };
 
                 transporter.sendMail(mailData, function (err, info) {
@@ -66,7 +66,7 @@ const register_user = async (req, res) => {
                         console.log(info);
                     });
                     
-                res.json({ message: "User created successfully", user: result.rows[0] });
+                res.json({ message: "User created successfully", user: user });
 
             } else {
                 res.status(500).json({ message: "Error creating user" });
@@ -83,21 +83,31 @@ const register_user = async (req, res) => {
 const generate_otp = async (req, res) => {
     try {
         const { email } = req.body;
-        const result = await db.query('SELECT * FROM users');
-        const user = await result.rows.find(u => { return u.email === email});
+        const result = await UserModel.find();
+        const user = await result.find(u => { return u.email === email});
     
         if (user) {
             const otp = Math.floor(10000 + Math.random() * 90000).toString();
-            const result = await db.query(
-                'INSERT INTO temp_otp (email, otp, created_at) VALUES ($1, $2, $3) RETURNING *',
-                [email, otp, new Date()]
-            );
 
-            res.json({ message: "OTP created successfully", payload: result.rows[0] });
+            const newTempOTP = new otpModel({
+                email: email,
+                otp: otp,
+                created_at: new Date()
+              });
+              
+              // Save the tempOTP document to the database
+              try {
+                const result = await newTempOTP.save();
+                console.log(result); 
+              } catch (error) {
+                console.error(error);
+              }
+
+            res.json({ message: "OTP created successfully", payload: result });
 
             const mailData = {
                 from: 'aiarjun027@gmail.com', 
-                  to: result.rows[0].email,   
+                  to: email,   
                   subject: 'OTP - please do not share dude',
                   text: 'OTP requested',
                   html: `<b>Hey there! </b> <br> your otp is ${otp}<br/>`,
@@ -124,30 +134,19 @@ const change_password = async (req, res) => {
         const { email, new_password, otp } = req.body;
 
         if (email && otp) {
-            const result = await db.query('SELECT * FROM temp_otp');
-    
-            const check_otp = await result.rows.find(u => { return u.email === email && u.otp === otp });
+            const check_otp = await otpModel.findOne({ email: email, otp: otp });
             if (check_otp) {
                 try {
-                    const result = await db.query(
-                        'UPDATE users SET password = $1 WHERE email = $2 RETURNING *',
-                        [new_password, email]
+                    const updatedUser = await UserModel.findOneAndUpdate(
+                        { email: email },
+                        { password: new_password },
+                        { new: true }
                     );
 
-                    const count_ = await db.query(
-                        'UPDATE change_password SET count = $1 WHERE email = $2 RETURNING *',
-                        [1, email]
-                    );
+                    await otpModel.deleteOne({ email: email });
 
-                    const delete_ = await db.query(
-                        'DELETE FROM temp_otp WHERE email = $1 RETURNING *',
-                        [email]
-                    );
-
-                    if (result.rows.length > 0) {
-
-                        res.json({ message: "User password changed successfully", user: result.rows[0] });
-
+                    if (updatedUser) {
+                        res.json({ message: "User password changed successfully", user: updatedUser });
                     } else {
                         res.status(500).json({ message: "Error changing password" });
                     }
