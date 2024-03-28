@@ -1,8 +1,14 @@
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-const { UserModel,otpModel } = require('../models/Models')
-const { transporter } = require('../utils/utils')
+const { transporter } = require('../utils/utils');
+const { UserModel,
+    otpModel,
+    projectAssignmentModel,
+    timesheetModel,
+    projectModel,
+    feedbackModel } = require('../model/mongo_models');
 
+    
 const login = async (req, res) => {
     try {
         const result = await UserModel.find();
