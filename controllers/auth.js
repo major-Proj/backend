@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const accessTokenSecret = 'youraccesstokensecret';
-const { transporter } = require('../utils/utils');
+const { transporter } = require('../utils/auth_utils');
 const { UserModel,
     otpModel,
     projectAssignmentModel,
@@ -49,14 +49,6 @@ const register_user = async (req, res) => {
               try {
                 const result = await newUser.save();
                 console.log(result);
-                
-              } catch (error) {
-                console.error(error);
-              }
-            
-            const user = await UserModel.findOne({ email: email });
-            if (user) {
-
                 const mailData = {
                     from: 'aiarjun027@gmail.com', 
                       to: email,   
@@ -72,11 +64,13 @@ const register_user = async (req, res) => {
                         console.log(info);
                     });
                     
-                res.json({ message: "User created successfully", user: user });
-
-            } else {
-                res.status(500).json({ message: "Error creating user" });
-            }
+                res.json({ message: "User created successfully"})
+                
+              } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: "Error creating user" })
+              }
+            
         } else {
             res.status(403).json({ message: "Only admins can perform this function" });
         }

@@ -90,8 +90,12 @@ const feedbackSchema = new mongoose.Schema({
   comments: {
     type: String
   },
-  time_period: {
-    type: String,
+  start_period: {
+    type: Date,
+    required: true
+  },
+  end_period: {
+    type: Date,
     required: true
   },
   created_at: {
@@ -130,20 +134,30 @@ const projectAssignmentModel = mongoose.model('projectAssignments', projectAssig
 
 // Define Timesheet Schema
 const timesheetSchema = new mongoose.Schema({
+  UID:{
+    type: String,
+    unique: true,
+    required:true
+  },
   email: {
     type: String,
     required: true
   },
   PID: {
-    type: String,
-    required: true
+    type: String
   },
   activity: {
-    type: String,
+    type: String
+  },
+  comments:{
+    type: String
+  },
+  start_period: {
+    type: Date,
     required: true
   },
-  time_period: {
-    type: String,
+  end_period: {
+    type: Date,
     required: true
   },
   mon: {
@@ -177,6 +191,10 @@ const timesheetSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: Date.now
+  },
+  visible:{
+    type:Boolean,
+    default:true
   }
 });
 

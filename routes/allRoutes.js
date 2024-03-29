@@ -1,10 +1,12 @@
 const { Router } = require('express'); 
-const utils = require('../utils/utils')
+const utils = require('../utils/auth_utils')
 
 const router = Router();
 
 const AuthControllers = require('../controllers/auth');
 const AdminControllers = require('../controllers/admin_controls')
+const TimesheetControllers = require('../controllers/timesheet')
+
 
 //main apis
 router.get('/test',AuthControllers.test);
@@ -16,5 +18,8 @@ router.post('/userDetail',AuthControllers.user_detail);
 router.post('/createProject',utils.authenticateJWT,AdminControllers.create_project)
 router.get('/getUsersProjects',utils.authenticateJWT,AdminControllers.getUsersProjects)
 router.post('/allocateProject',utils.authenticateJWT,AdminControllers.allocate_project)
+router.post('/getTimesheetData',utils.authenticateJWT,TimesheetControllers.RertreiveTimesheetPerWeek)
+router.get('/getUserProject',utils.authenticateJWT,TimesheetControllers.RetreiveUserProject)
+router.post('/CreateUpdateTimesheets',utils.authenticateJWT,TimesheetControllers.CreateUpdateTimesheets)
 
 module.exports = router;
