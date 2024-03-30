@@ -1,4 +1,3 @@
-const path = require('path')
 const express = require('express');
 const app = express();
 const myRoute = require('./routes/allRoutes');
@@ -13,6 +12,6 @@ app.use(bodyParser.json());
 app.use(cors())
 app.use('/api', myRoute);
 
-app.listen(3000, () => {
-    console.log('Application service started on port 3000');
+app.listen(5000, () => {
+    console.log('Application service started on port 5000');
 });

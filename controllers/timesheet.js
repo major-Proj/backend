@@ -15,7 +15,8 @@ const RertreiveTimesheetPerWeek = async (req,res) => {
         const timeSheetdata = await timesheetModel.find({
             email:user,
             start_period:startPeriod,
-            end_period:endPeriod
+            end_period:endPeriod,
+            visible:true
         })
 
         if(timeSheetdata.length !== 0) {
