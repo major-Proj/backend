@@ -45,7 +45,7 @@ const RertreiveTimesheetPerWeek = async (req,res) => {
             try {
                 const result = await newTimeSheet.save();
                 console.log(result); 
-                res.json({ message: "Timesheet data sent", payload: ConvertTimesheetFormat([timeSheetdata]) });
+                res.json({ message: "Timesheet data sent", payload: ConvertTimesheetFormat([result]) });
             } catch (error) {
                 console.error(error);
             }
@@ -63,8 +63,6 @@ const RetreiveUserProject = async (req,res) => {
             email:req.user.email
         });
 
-        console.log(req.user.email);
-        console.log(userproject);
     
         if(userproject.length !== 0) {
             
