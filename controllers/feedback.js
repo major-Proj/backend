@@ -81,7 +81,7 @@ const feedbackGiven = async (req, res) => {
                 feedback_given:feedback_given
             });
             await newFeedbackHistory.save();
-            console.log(`New feedback entry created for UID ${value.UID}`);
+            console.log(`New feedback entry created for UID ${UID}`);
         }
     } catch (error) {
         console.log(error);
