@@ -6,6 +6,7 @@ const router = Router();
 const AuthControllers = require('../controllers/auth');
 const AdminControllers = require('../controllers/admin_controls')
 const TimesheetControllers = require('../controllers/timesheet')
+const FeedbackControllers = require('../controllers/feedback')
 
 
 //main apis
@@ -21,5 +22,8 @@ router.post('/allocateProject',utils.authenticateJWT,AdminControllers.allocate_p
 router.post('/getTimesheetData',utils.authenticateJWT,TimesheetControllers.RertreiveTimesheetPerWeek)
 router.get('/getUserProject',utils.authenticateJWT,TimesheetControllers.RetreiveUserProject)
 router.post('/CreateUpdateTimesheets',utils.authenticateJWT,TimesheetControllers.CreateUpdateTimesheets)
+router.post('/CreateFeedback',utils.authenticateJWT,FeedbackControllers.CreateFeedbackEntry)
+router.post('/FeedbackHistory',utils.authenticateJWT,FeedbackControllers.feedbackGiven)
+router.get('/Unfilledfeedbacks',utils.authenticateJWT,FeedbackControllers.RetreiveUnfilledFeedbacks)
 
 module.exports = router;

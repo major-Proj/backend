@@ -83,12 +83,44 @@ const feedbackSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  question: {
-    type: String,
-    required: true
+  role:{
+    type:String,
+    required:true
   },
-  comments: {
-    type: String
+  q1:{
+    type:Number,
+    required:true
+  },
+  q2:{
+    type:Number,
+    required:true
+  },
+  q3:{
+    type:Number,
+    required:true
+  },
+  q4:{
+    type:Number,
+    required:true
+  },
+  q5:{
+    type:Number,
+    required:true
+  },
+  q6:{
+    type:Number,
+    required:true
+  },
+  q7:{
+    type:Number,
+    required:true
+  },
+  q8:{
+    type:Number,
+    required:true
+  },
+  comments:{
+    type:String,
   },
   start_period: {
     type: Date,
@@ -105,6 +137,35 @@ const feedbackSchema = new mongoose.Schema({
 });
 
 const feedbackModel = mongoose.model('feedbacks', feedbackSchema);
+
+const feedbackHistorySchema = new mongoose.Schema({
+  PID:{
+    type: String,
+    required:true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  start_period: {
+    type: Date,
+    required: true
+  },
+  end_period: {
+    type: Date,
+    required: true
+  },
+  feedback_given:{
+    type:Boolean,
+    required:true
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const feedbackHistoryModel = mongoose.model('feedback_histories', feedbackHistorySchema);
 
 // Define Project Assignment Schema
 const projectAssignmentSchema = new mongoose.Schema({
@@ -208,5 +269,6 @@ module.exports = {
     projectAssignmentModel,
     timesheetModel,
     projectModel,
-    feedbackModel
+    feedbackModel,
+    feedbackHistoryModel
 };
