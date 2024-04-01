@@ -96,9 +96,10 @@ const RetreiveUnfilledFeedbacks = async(req,res) => {
             email:req.user.email,
             feedback_given:false
         })
+
+        const projects = await projectModel.find()
         
-        console.log(feedbackhistory);
-        res.json({"message":"Feedback data sent","payload":feedbackhistory})
+        res.json({"message":"Feedback data sent","payload":feedbackhistory,"projects":projects})
     } catch (error) {
         console.log(error);
         res.json({"message":"error retreiving feedback history"})
