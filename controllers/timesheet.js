@@ -5,23 +5,32 @@ const { UserModel,
     feedbackModel,
     feedbackHistoryModel } = require('../model/mongo_models');
 
-const {ConvertTimesheetFormat,RetreiveProjectName} = require('../utils/timesheet_utils')
+const { ConvertTimesheetFormat, RetreiveProjectName } = require('../utils/timesheet_utils')
 
-const RertreiveTimesheetPerWeek = async (req,res) => {
+const RertreiveTimesheetPerWeek = async (req, res) => {
     try {
+        const role = req.user.role;
+        console.log(role);
+        console.log(req.body);
 
+        let user;
 
-        const user = req.user.email;
-        const { startPeriod , endPeriod } = req.body;
+        if (role === 'admin') {
+            user = req.body.email;
+        } else {
+            user = req.user.email;
+        }
+
+        const { startPeriod, endPeriod } = req.body;
         const timeSheetdata = await timesheetModel.find({
-            email:user,
-            start_period:startPeriod,
-            end_period:endPeriod,
-            visible:true
+            email: user,
+            start_period: startPeriod,
+            end_period: endPeriod,
+            visible: true
         })
 
-        if(timeSheetdata.length !== 0) {
-            
+        if (timeSheetdata.length !== 0) {
+
             res.json({ message: "Timesheet data sent", payload: ConvertTimesheetFormat(timeSheetdata) });
         }
         else {
@@ -30,7 +39,7 @@ const RertreiveTimesheetPerWeek = async (req,res) => {
                 email: user,
                 PID: "", // Assuming PID is empty initially
                 activity: "",
-                comments:"",
+                comments: "",
                 start_period: startPeriod, // Example start date
                 end_period: endPeriod, // Example end date
                 mon: 0,
@@ -42,10 +51,10 @@ const RertreiveTimesheetPerWeek = async (req,res) => {
                 sun: 0,
                 created_at: new Date()
             });
-            
+
             try {
                 const result = await newTimeSheet.save();
-                console.log(result); 
+                console.log(result);
                 res.json({ message: "Timesheet data sent", payload: ConvertTimesheetFormat([result]) });
             } catch (error) {
                 console.error(error);
@@ -54,28 +63,28 @@ const RertreiveTimesheetPerWeek = async (req,res) => {
         }
     } catch (error) {
         console.log(error);
-        res.json({"message": "unable to retreive timesheet data"});
+        res.json({ "message": "unable to retreive timesheet data" });
     }
 }
 
-const RetreiveUserProject = async (req,res) => {
+const RetreiveUserProject = async (req, res) => {
     try {
         const userproject = await projectAssignmentModel.find({
-            email:req.user.email
+            email: req.user.email
         });
 
-    
-        if(userproject.length !== 0) {
-            
-            res.json({ message: "Project sent", payload: await RetreiveProjectName(userproject)});
+
+        if (userproject.length !== 0) {
+
+            res.json({ message: "Project sent", payload: await RetreiveProjectName(userproject) });
         }
-        else{
-            res.json({ message: "Project sent", payload: [{PID:"0",name:"bench"}]});
+        else {
+            res.json({ message: "Project sent", payload: [{ PID: "0", name: "bench" }] });
         }
     }
-    catch{
+    catch {
         console.log(error);
-        res.json({"message": "unable to retreive project data"});
+        res.json({ "message": "unable to retreive project data" });
     }
 }
 
@@ -86,7 +95,7 @@ const CreateUpdateTimesheets = async (req, res) => {
         for (const [key, value] of Object.entries(data)) {
             const existingTimesheet = await timesheetModel.findOne({
                 UID: value.UID,
-                email: value.email, 
+                email: value.email,
                 start_period: value.start_period,
                 end_period: value.end_period
             });
@@ -116,7 +125,7 @@ const CreateUpdateTimesheets = async (req, res) => {
 };
 
 
-module.exports ={
+module.exports = {
     RertreiveTimesheetPerWeek,
     RetreiveUserProject,
     CreateUpdateTimesheets

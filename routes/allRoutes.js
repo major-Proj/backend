@@ -7,6 +7,7 @@ const AuthControllers = require('../controllers/auth');
 const AdminControllers = require('../controllers/admin_controls')
 const TimesheetControllers = require('../controllers/timesheet')
 const FeedbackControllers = require('../controllers/feedback')
+const DashboardControllers = require('../controllers/dashboard')
 
 
 //main apis
@@ -25,5 +26,6 @@ router.post('/CreateUpdateTimesheets',utils.authenticateJWT,TimesheetControllers
 router.post('/CreateFeedback',utils.authenticateJWT,FeedbackControllers.CreateFeedbackEntry)
 router.post('/FeedbackHistory',utils.authenticateJWT,FeedbackControllers.feedbackGiven)
 router.get('/Unfilledfeedbacks',utils.authenticateJWT,FeedbackControllers.RetreiveUnfilledFeedbacks)
+router.get('/dashboard',utils.authenticateJWT,DashboardControllers.HomePageDash)
 
 module.exports = router;

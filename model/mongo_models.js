@@ -42,6 +42,7 @@ const otpSchema = new mongoose.Schema({
     }
   });
 
+otpSchema.index({ createdAt: 1 }, { expireAfterSeconds: 120 });
 // Define Project Schema
 const projectSchema = new mongoose.Schema({
   PID: {
@@ -256,6 +257,10 @@ const timesheetSchema = new mongoose.Schema({
   visible:{
     type:Boolean,
     default:true
+  },
+  submitted:{
+    type:Boolean,
+    default:false
   }
 });
 
