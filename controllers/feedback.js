@@ -71,6 +71,7 @@ const feedbackGiven = async (req, res) => {
             }, {
                 $set: { feedback_given:feedback_given  }
             });
+            res.json({ "message": "feedback history updated!" })
             console.log(`Feedback entry updated for PID ${PID}`);
         } else {
             const newFeedbackHistory = new feedbackHistoryModel({
@@ -81,7 +82,8 @@ const feedbackGiven = async (req, res) => {
                 feedback_given:feedback_given
             });
             await newFeedbackHistory.save();
-            console.log(`New feedback entry created for UID ${UID}`);
+            res.json({ "message": "feedback history updated!" })
+            console.log(`New feedback entry created for PID ${PID}`);
         }
     } catch (error) {
         console.log(error);
