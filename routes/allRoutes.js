@@ -27,5 +27,6 @@ router.post('/CreateFeedback',utils.authenticateJWT,FeedbackControllers.CreateFe
 router.post('/FeedbackHistory',utils.authenticateJWT,FeedbackControllers.feedbackGiven)
 router.get('/Unfilledfeedbacks',utils.authenticateJWT,FeedbackControllers.RetreiveUnfilledFeedbacks)
 router.get('/dashboard',utils.authenticateJWT,DashboardControllers.HomePageDash)
+router.post('/AllFeedbacks',utils.authenticateJWT,FeedbackControllers.RetreiveAllFeedbacks)
 
 module.exports = router;

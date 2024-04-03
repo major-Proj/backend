@@ -10,8 +10,6 @@ const { ConvertTimesheetFormat, RetreiveProjectName } = require('../utils/timesh
 const RertreiveTimesheetPerWeek = async (req, res) => {
     try {
         const role = req.user.role;
-        console.log(role);
-        console.log(req.body);
 
         let user;
 
@@ -55,7 +53,7 @@ const RertreiveTimesheetPerWeek = async (req, res) => {
             try {
                 const result = await newTimeSheet.save();
                 console.log(result);
-                res.json({ message: "Timesheet data sent", payload: ConvertTimesheetFormat([result]) });
+                res.json({ message: "Timesheet data created and sent", payload: ConvertTimesheetFormat([result]) });
             } catch (error) {
                 console.error(error);
             }

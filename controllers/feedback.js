@@ -108,8 +108,35 @@ const RetreiveUnfilledFeedbacks = async(req,res) => {
     }
 
 }
+
+const RetreiveAllFeedbacks = async(req,res) => {
+
+    try {
+        if (req.user.role='admin'){
+            console.log(req.body)
+            const {startPeriod,endPeriod,email} = req.body;
+            const feedBacks = await feedbackModel.find({
+                email:email,
+                start_period:startPeriod,
+                end_period:endPeriod
+            })
+
+            if(feedBacks){
+                res.json({message:"feedback data sent",payload:feedBacks})
+            } else {
+                res.json({message:"no feedbacks found for this date"})
+            }
+        } else {
+            res.json({message:"not authorized to view feedbacks"})
+        }
+    } catch (error) {
+        console.log(error)
+        res.json({message:"failed to get feedback"})
+    }
+}
     module.exports = {
         CreateFeedbackEntry,
         feedbackGiven,
-        RetreiveUnfilledFeedbacks
+        RetreiveUnfilledFeedbacks,
+        RetreiveAllFeedbacks
     }
