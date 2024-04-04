@@ -18,10 +18,10 @@ app.listen(5000, () => {
     console.log('Application service started on port 5000');
 });
 
-async function main() {
-    const val = await background_processes.backgroundFunction();
-    console.log(val)
-}
+// async function main() {
+//     const val = await background_processes.backgroundFunction();
+//     console.log(val)
+// }
 
-// Call the main function initially
-main();
+// // Call the main function initially
+// main();

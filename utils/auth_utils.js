@@ -32,8 +32,19 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
+const authorizationCheck = (req, res, next) => {
+  const role = req.user.role;
+
+  if (role==='admin') {
+    next();
+  } else {
+    res.status(401).send('only admin nauthorized to access this endpoint');
+  }
+};
+
 
 module.exports = {
     authenticateJWT,
-    transporter
+    transporter,
+    authorizationCheck
   }

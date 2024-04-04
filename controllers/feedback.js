@@ -69,7 +69,7 @@ const feedbackGiven = async (req, res) => {
                 start_period: start_period,
                 end_period: end_period
             }, {
-                $set: { feedback_given:feedback_given  }
+                $set: { feedback_given: feedback_given }
             });
             res.json({ "message": "feedback history updated!" })
             console.log(`Feedback entry updated for PID ${PID}`);
@@ -79,7 +79,7 @@ const feedbackGiven = async (req, res) => {
                 PID: PID,
                 start_period: start_period,
                 end_period: end_period,
-                feedback_given:feedback_given
+                feedback_given: feedback_given
             });
             await newFeedbackHistory.save();
             res.json({ "message": "feedback history updated!" })
@@ -91,52 +91,50 @@ const feedbackGiven = async (req, res) => {
     }
 }
 
-const RetreiveUnfilledFeedbacks = async(req,res) => {
+const RetreiveUnfilledFeedbacks = async (req, res) => {
 
     try {
         const feedbackhistory = await feedbackHistoryModel.find({
-            email:req.user.email,
-            feedback_given:false
+            email: req.user.email,
+            feedback_given: false
         })
 
         const projects = await projectModel.find()
-        
-        res.json({"message":"Feedback data sent","payload":feedbackhistory,"projects":projects})
+
+        res.json({ "message": "Feedback data sent", "payload": feedbackhistory, "projects": projects })
     } catch (error) {
         console.log(error);
-        res.json({"message":"error retreiving feedback history"})
+        res.json({ "message": "error retreiving feedback history" })
     }
 
 }
 
-const RetreiveAllFeedbacks = async(req,res) => {
+const RetreiveAllFeedbacks = async (req, res) => {
 
     try {
-        if (req.user.role='admin'){
-            console.log(req.body)
-            const {startPeriod,endPeriod,email} = req.body;
-            const feedBacks = await feedbackModel.find({
-                email:email,
-                start_period:startPeriod,
-                end_period:endPeriod
-            })
 
-            if(feedBacks){
-                res.json({message:"feedback data sent",payload:feedBacks})
-            } else {
-                res.json({message:"no feedbacks found for this date"})
-            }
+        console.log(req.body)
+        const { startPeriod, endPeriod, email } = req.body;
+        const feedBacks = await feedbackModel.find({
+            email: email,
+            start_period: startPeriod,
+            end_period: endPeriod
+        })
+
+        if (feedBacks) {
+            res.json({ message: "feedback data sent", payload: feedBacks })
         } else {
-            res.json({message:"not authorized to view feedbacks"})
+            res.json({ message: "no feedbacks found for this date" })
         }
+
     } catch (error) {
         console.log(error)
-        res.json({message:"failed to get feedback"})
+        res.json({ message: "failed to get feedback" })
     }
 }
-    module.exports = {
-        CreateFeedbackEntry,
-        feedbackGiven,
-        RetreiveUnfilledFeedbacks,
-        RetreiveAllFeedbacks
-    }
+module.exports = {
+    CreateFeedbackEntry,
+    feedbackGiven,
+    RetreiveUnfilledFeedbacks,
+    RetreiveAllFeedbacks
+}

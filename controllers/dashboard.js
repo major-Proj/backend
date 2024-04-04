@@ -9,8 +9,6 @@ const { UserModel,
 const HomePageDash = async(req,res) => {
     try{
         const email = req.user.email;
-        const role = req.user.role;
-        console.log(email)
         const uniqueDatesTimesheets = new Set();
         const uniqueDatesFeedbacks = new Set();
 
@@ -24,10 +22,6 @@ const HomePageDash = async(req,res) => {
             email:email,
             feedback_given:true
         })
-
-
-        console.log(existingFilledFeedback);
-        console.log(existingFilledTimesheets);
 
         for (let i=0;i<existingFilledTimesheets.length;i++){
             startDate = new Date(existingFilledTimesheets[i].start_period).toDateString()
