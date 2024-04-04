@@ -1,18 +1,24 @@
+const { Worker, isMainThread, parentPort } = require('node:worker_threads');
+const BackgroundFunctions = require('../background_processes/background_functions')
+
 function backgroundFunction() {
     return new Promise((resolve, reject) => {
-        console.log('Executing background function...');
-        let i = 0;
-        let sum = 0;
-        for (i; i < 1000000000000000000000000; i++) {
-            sum += i;
-        }
-        console.log(sum)
-        resolve(sum);
+        const worker = new Worker(__filename);
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+            if (code !== 0)
+                reject(new Error(`Worker stopped with exit code ${code}`));
+        });
     });
-
-    //setTimeout(backgroundFunction, 6000); // 1 minute interval (in milliseconds)
 }
 
-module.exports = {
-    backgroundFunction
+if (!isMainThread) {
+    console.log('Executing background functions...');
+    BackgroundFunctions.SendReminderMail();
+    parentPort.postMessage("background works done!");
+} else {
+    module.exports = {
+        backgroundFunction
+    };
 }

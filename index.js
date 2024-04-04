@@ -7,7 +7,6 @@ const background_processes = require('./background_processes/background');
 
 var cors = require('cors')
 
-
 app.use(express.json());
 app.use(bodyParser.json());
 
@@ -18,10 +17,14 @@ app.listen(5000, () => {
     console.log('Application service started on port 5000');
 });
 
-// async function main() {
-//     const val = await background_processes.backgroundFunction();
-//     console.log(val)
-// }
+async function background_processes_run() {
+    const val = await background_processes.backgroundFunction();
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const timeUntilTomorrow = tomorrow - now;
+    setTimeout(background_processes_run, timeUntilTomorrow);
+}
 
-// // Call the main function initially
-// main();
+background_processes_run();
