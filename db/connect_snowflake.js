@@ -2,7 +2,7 @@ var snowflake = require('snowflake-sdk');
 
 async function CreateConnection() {
     const sf_connection = snowflake.createConnection({
-        account: '',
+        account: 'QFTWANW-PB48829',
         username: 'ARJUNJMAN',
         password: '',
         application: 'Timely'
@@ -26,8 +26,12 @@ async function CreateConnection() {
     } catch (error) {
         console.error('Error connecting to Snowflake:', error);
     }
+    
+    
 
     return sf_connection
+
+    
 }
 
 module.exports = {

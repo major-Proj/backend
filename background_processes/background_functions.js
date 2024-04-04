@@ -2,10 +2,10 @@ const mongodb = require('../db/connect.js');
 const { UserModel, timesheetModel, feedbackHistoryModel } = require('../model/mongo_models');
 const { CheckTimesheets } = require('../utils/mail_utils.js');
 const {CreateConnection} = require('../db/connect_snowflake.js')
+const { CreateTables } = require('../migration/CreateTables.js');
 
 async function SendReminderMail() {
 
-    CreateConnection()
     const today = new Date();
     const todayDay = today.getDay();
 
@@ -26,7 +26,12 @@ async function SendReminderMail() {
     }
 }
 
+async function Migration(){
+    conn = await CreateConnection();
+    CreateTables(conn);
+}
 
 module.exports = {
-    SendReminderMail
+    SendReminderMail,
+    Migration
 }
