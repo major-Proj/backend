@@ -3,6 +3,7 @@ const { UserModel, timesheetModel, feedbackHistoryModel } = require('../model/mo
 const { CheckTimesheets } = require('../utils/mail_utils.js');
 const {CreateConnection} = require('../db/connect_snowflake.js')
 const { CreateTables } = require('../migration/CreateTables.js');
+const { MigrateData } = require('../migration/MigrateData.js');
 
 async function SendReminderMail() {
 
@@ -28,7 +29,13 @@ async function SendReminderMail() {
 
 async function Migration(){
     conn = await CreateConnection();
-    CreateTables(conn);
+    try{
+        await CreateTables(conn);
+        await MigrateData(conn);
+    } catch (error) {
+        console.log(error)
+    }
+    
 }
 
 module.exports = {

@@ -10,7 +10,7 @@ async function CreateTables(conn){
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created feedback_history');
             }
         }
     });
@@ -22,43 +22,43 @@ async function CreateTables(conn){
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created feedbacks');
             }
         }
     });
     
     conn.execute({
         
-        sqlText: 'CREATE TABLE IF NOT EXISTS raw.projectAssignments (id VARCHAR(255) PRIMARY KEY, PID INT, email VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, allocation_start TIMESTAMP, allocation_end TIMESTAMP)',
+        sqlText: 'CREATE TABLE IF NOT EXISTS raw.projectAssignments (id VARCHAR(255) PRIMARY KEY, PID VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, allocation_start TIMESTAMP, allocation_end TIMESTAMP)',
         complete: function(err, stmt, rows) {
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created projectAssignments');
             }
         }
     });
     
     conn.execute({
         
-        sqlText: 'CREATE TABLE IF NOT EXISTS raw.projects (id VARCHAR(255) PRIMARY KEY, PID INT, name VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, start_period TIMESTAMP, end_period TIMESTAMP)',
+        sqlText: 'CREATE TABLE IF NOT EXISTS raw.projects (id VARCHAR(255) PRIMARY KEY, PID VARCHAR(255), name VARCHAR(255),client_name VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, start_period TIMESTAMP, end_period TIMESTAMP)',
         complete: function(err, stmt, rows) {
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created projects');
             }
         }
     });
     
     conn.execute({
         
-        sqlText: 'CREATE TABLE IF NOT EXISTS raw.timesheets (id VARCHAR(255) PRIMARY KEY, PID INT, email VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, start_period TIMESTAMP, end_period TIMESTAMP, mon INT,tue INT, wed INT, thur INT, fri INT, sat INT, sun INT)',
+        sqlText: 'CREATE TABLE IF NOT EXISTS raw.timesheets (id VARCHAR(255) PRIMARY KEY, PID VARCHAR(255), email VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, start_period TIMESTAMP, end_period TIMESTAMP, mon INT,tue INT, wed INT, thur INT, fri INT, sat INT, sun INT, visible VARCHAR(255), submitted VARCHAR(255))',
         complete: function(err, stmt, rows) {
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created timesheets');
             }
         }
     });
@@ -70,7 +70,7 @@ async function CreateTables(conn){
             if (err) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
             } else {
-                console.log('Successfully executed statement: ' + stmt.getSqlText());
+                console.log('Successfully created users');
             }
         }
     });
