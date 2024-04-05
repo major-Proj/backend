@@ -4,7 +4,7 @@ async function CreateConnection() {
     const sf_connection = snowflake.createConnection({
         account: 'QFTWANW-PB48829',
         username: 'ARJUNJMAN',
-        password: '',
+        password: 'Jman@600113',
         application: 'Timely'
     });
 

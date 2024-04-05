@@ -16,7 +16,7 @@ function backgroundFunction() {
 if (!isMainThread) {
     console.log('Executing background functions...');
     BackgroundFunctions.SendReminderMail();
-    BackgroundFunctions.Migration()
+    //BackgroundFunctions.Migration()
     parentPort.postMessage("background works done!");
 } else {
     module.exports = {
